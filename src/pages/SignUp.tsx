@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Card,
   CardContent,
@@ -12,15 +13,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 const SignUp = () => {
   const [role, setRole] = useState<"teacher" | "student" | null>(null);
+  const [step, setStep] = useState<"role" | "details">("role");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [gender, setGender] = useState<"male" | "female" | "non-binary" | "prefer-not-to-say">("prefer-not-to-say");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { signUp } = useAuth();
@@ -29,16 +33,7 @@ const SignUp = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!role) {
-      toast({
-        title: "Please select a role",
-        description: "Choose whether you want to sign up as a teacher or student.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (!name || !email || !password) {
+    if (!role || !name || !email || !password) {
       toast({
         title: "Missing information",
         description: "Please fill in all fields to continue.",
@@ -50,15 +45,13 @@ const SignUp = () => {
     try {
       setIsSubmitting(true);
       
-      // In a real app, this would connect to Supabase Auth
-      await signUp(email, password, role, name);
+      await signUp(email, password, role, name, gender);
       
       toast({
         title: "Account created!",
         description: "You have successfully signed up for Learn9ja.",
       });
       
-      // Redirect to appropriate dashboard
       if (role === "teacher") {
         navigate("/teacher/dashboard");
       } else {
@@ -93,12 +86,15 @@ const SignUp = () => {
             </CardHeader>
 
             <CardContent>
-              {!role ? (
+              {step === "role" ? (
                 <div className="space-y-4">
                   <h3 className="text-center font-medium text-lg">I want to join as:</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <button
-                      onClick={() => setRole("student")}
+                      onClick={() => {
+                        setRole("student");
+                        setStep("details");
+                      }}
                       className="p-4 border border-gray-200 rounded-lg text-center hover:border-learn9ja-green hover:bg-learn9ja-green/5 transition-all focus:outline-none focus:ring-2 focus:ring-learn9ja-green"
                     >
                       <div className="text-xl font-medium">👨‍🎓</div>
@@ -107,7 +103,10 @@ const SignUp = () => {
                     </button>
                     
                     <button
-                      onClick={() => setRole("teacher")}
+                      onClick={() => {
+                        setRole("teacher");
+                        setStep("details");
+                      }}
                       className="p-4 border border-gray-200 rounded-lg text-center hover:border-learn9ja-green hover:bg-learn9ja-green/5 transition-all focus:outline-none focus:ring-2 focus:ring-learn9ja-green"
                     >
                       <div className="text-xl font-medium">👩‍🏫</div>
@@ -163,6 +162,32 @@ const SignUp = () => {
                     </p>
                   </div>
 
+                  <div className="space-y-2">
+                    <Label>Gender</Label>
+                    <RadioGroup
+                      value={gender}
+                      onValueChange={(value) => setGender(value as typeof gender)}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="male" id="male" />
+                        <Label htmlFor="male">Male</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="female" id="female" />
+                        <Label htmlFor="female">Female</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="non-binary" id="non-binary" />
+                        <Label htmlFor="non-binary">Non-binary</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="prefer-not-to-say" id="prefer-not-to-say" />
+                        <Label htmlFor="prefer-not-to-say">Prefer not to say</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
                   <Button
                     type="submit"
                     className="w-full bg-learn9ja-green hover:bg-learn9ja-green/90 mt-4"
@@ -174,7 +199,10 @@ const SignUp = () => {
                   <div className="text-center mt-4">
                     <button
                       type="button"
-                      onClick={() => setRole(null)}
+                      onClick={() => {
+                        setStep("role");
+                        setRole(null);
+                      }}
                       className="text-sm text-learn9ja-green hover:underline"
                     >
                       Go back to role selection

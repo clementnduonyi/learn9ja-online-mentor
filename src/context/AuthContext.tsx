@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type UserRole = 'teacher' | 'student' | null;
@@ -14,7 +13,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string, role: UserRole, name: string) => Promise<void>;
+  signUp: (email: string, password: string, role: UserRole, name: string, gender: string) => Promise<void>;
   logIn: (email: string, password: string) => Promise<void>;
   logOut: () => Promise<void>;
 }
@@ -47,11 +46,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoading(false);
   }, []);
 
-  const signUp = async (email: string, password: string, role: UserRole, name: string) => {
+  const signUp = async (email: string, password: string, role: UserRole, name: string, gender: string) => {
     setLoading(true);
     try {
       // This would be replaced with actual Supabase authentication
-      console.log('Sign up with:', email, password, role, name);
+      console.log('Sign up with:', email, password, role, name, gender);
       
       // Mock successful registration
       const newUser = {
