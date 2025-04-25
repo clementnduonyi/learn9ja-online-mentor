@@ -57,11 +57,11 @@ const SignUp = () => {
       } else {
         navigate("/student/dashboard");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup error:", error);
       toast({
         title: "Error creating account",
-        description: "An error occurred. Please try again.",
+        description: error.message || "An error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
